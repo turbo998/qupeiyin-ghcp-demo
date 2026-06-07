@@ -1,0 +1,5 @@
+# auto-generated SQLite
+data/*.db
+__pycache__/
+*.pyc
+.venv/

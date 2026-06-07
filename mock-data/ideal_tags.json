@@ -1,0 +1,201 @@
+[
+  {
+    "id": "m001",
+    "grade": [
+      "G1",
+      "G2",
+      "G3"
+    ],
+    "genre": "经典绘本",
+    "difficulty": "★★☆☆☆",
+    "keywords": [
+      "caterpillar",
+      "food",
+      "days of week",
+      "transformation"
+    ],
+    "suitable_voices": 1,
+    "duration_band": "短(<5min)",
+    "scene": "教材同步/启蒙",
+    "recommendation_score": 95
+  },
+  {
+    "id": "m002",
+    "grade": [
+      "G3",
+      "G4",
+      "G5",
+      "G6"
+    ],
+    "genre": "电影歌曲",
+    "difficulty": "★★★☆☆",
+    "keywords": [
+      "snow",
+      "freedom",
+      "emotion",
+      "Disney"
+    ],
+    "suitable_voices": 1,
+    "duration_band": "短(<5min)",
+    "scene": "口语/情感表达",
+    "recommendation_score": 88
+  },
+  {
+    "id": "m003",
+    "grade": [
+      "G1",
+      "G2"
+    ],
+    "genre": "动画日常",
+    "difficulty": "★☆☆☆☆",
+    "keywords": [
+      "family",
+      "daily",
+      "introduction",
+      "play"
+    ],
+    "suitable_voices": 4,
+    "duration_band": "短(<5min)",
+    "scene": "家庭场景/对话练习",
+    "recommendation_score": 97
+  },
+  {
+    "id": "m004",
+    "grade": [
+      "G7",
+      "G8",
+      "G9"
+    ],
+    "genre": "演讲",
+    "difficulty": "★★★★☆",
+    "keywords": [
+      "life",
+      "story",
+      "Stanford",
+      "inspiration"
+    ],
+    "suitable_voices": 1,
+    "duration_band": "短(<5min)",
+    "scene": "演讲/初中拓展",
+    "recommendation_score": 82
+  },
+  {
+    "id": "m005",
+    "grade": [
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "genre": "童话故事",
+    "difficulty": "★★☆☆☆",
+    "keywords": [
+      "fairy tale",
+      "wolf",
+      "family",
+      "narrative"
+    ],
+    "suitable_voices": 3,
+    "duration_band": "中(5-10min)",
+    "scene": "故事讲述/朗读",
+    "recommendation_score": 90
+  },
+  {
+    "id": "m006",
+    "grade": [
+      "G2",
+      "G3"
+    ],
+    "genre": "动画电影",
+    "difficulty": "★★☆☆☆",
+    "keywords": [
+      "toys",
+      "friendship",
+      "imagination",
+      "Pixar"
+    ],
+    "suitable_voices": 3,
+    "duration_band": "短(<5min)",
+    "scene": "对话练习/兴趣",
+    "recommendation_score": 92
+  },
+  {
+    "id": "m007",
+    "grade": [
+      "G6",
+      "G7",
+      "G8"
+    ],
+    "genre": "科普纪录",
+    "difficulty": "★★★★☆",
+    "keywords": [
+      "science",
+      "vaccine",
+      "immune",
+      "biology"
+    ],
+    "suitable_voices": 1,
+    "duration_band": "短(<5min)",
+    "scene": "学科英语/STEM",
+    "recommendation_score": 78
+  },
+  {
+    "id": "m008",
+    "grade": [
+      "K",
+      "G1"
+    ],
+    "genre": "儿歌律动",
+    "difficulty": "★☆☆☆☆",
+    "keywords": [
+      "greeting",
+      "action",
+      "song",
+      "preschool"
+    ],
+    "suitable_voices": 1,
+    "duration_band": "短(<5min)",
+    "scene": "启蒙/磨耳朵",
+    "recommendation_score": 96
+  },
+  {
+    "id": "m009",
+    "grade": [
+      "G9",
+      "G10",
+      "G11",
+      "G12"
+    ],
+    "genre": "文学戏剧",
+    "difficulty": "★★★★★",
+    "keywords": [
+      "Shakespeare",
+      "drama",
+      "love",
+      "classic literature"
+    ],
+    "suitable_voices": 2,
+    "duration_band": "短(<5min)",
+    "scene": "高中拓展/文学",
+    "recommendation_score": 70
+  },
+  {
+    "id": "m010",
+    "grade": [
+      "G4",
+      "G5",
+      "G6"
+    ],
+    "genre": "自然纪录",
+    "difficulty": "★★★☆☆",
+    "keywords": [
+      "nature",
+      "penguin",
+      "Antarctica",
+      "documentary"
+    ],
+    "suitable_voices": 1,
+    "duration_band": "中(5-10min)",
+    "scene": "学科英语/自然",
+    "recommendation_score": 85
+  }
+]

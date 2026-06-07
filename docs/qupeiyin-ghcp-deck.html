@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>趣配音 × GitHub Copilot · FDE Briefing 2026</title>
+<style>
+
+:root {
+  --azure-blue: #0078D4;
+  --azure-dark-blue: #005A9E;
+  --azure-cyan: #50E6FF;
+  --azure-navy: #243A5E;
+  --azure-ink: #1F2937;
+  --azure-gray: #5F6B7A;
+  --azure-light-gray: #F5F9FD;
+  --azure-border: #D6E9F8;
+  --qpy-orange: #FF6B35;
+  --qpy-orange-light: #FFE4D6;
+  --qpy-orange-dark: #D54F1F;
+  --success: #107C10;
+  --warning: #FFB900;
+  --danger: #D13438;
+  --neutral: #6B7280;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Roboto, sans-serif;
+  background: linear-gradient(135deg, var(--azure-dark-blue), var(--azure-blue));
+  color: var(--azure-ink);
+}
+.slide-container { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+.slide {
+  position: absolute;
+  width: 100vw;
+  min-height: 100vh;
+  max-height: 100vh;
+  background: rgba(255,255,255,0.98);
+  padding: 48px 64px 90px 64px;
+  left: 0; top: 0;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.55s ease;
+  overflow-y: auto;
+  color: var(--azure-ink);
+}
+.slide.active { opacity: 1; transform: translateX(0); z-index: 10; }
+.slide.cover {
+  background: linear-gradient(135deg, #0a2647 0%, #144272 45%, #205295 100%);
+  color: #fff;
+}
+h1 {
+  font-size: 2.2em; font-weight: 700; color: var(--azure-blue);
+  border-bottom: 4px solid var(--azure-cyan);
+  padding-bottom: 10px; margin-bottom: 22px;
+}
+h2 { font-size: 1.35em; color: var(--azure-dark-blue); margin: 14px 0 10px; }
+h3 { font-size: 1.1em; color: var(--azure-blue); margin: 10px 0 8px; }
+p { font-size: 0.96em; line-height: 1.6; color: var(--azure-gray); margin: 6px 0; }
+small { font-size: 0.84em; color: var(--neutral); }
+ul { padding-left: 22px; }
+li { font-size: 0.95em; line-height: 1.7; color: var(--azure-gray); }
+code { background: rgba(0,120,212,0.10); padding: 1px 6px; border-radius: 4px; font-family: "SF Mono","Consolas",monospace; color: var(--azure-dark-blue); font-size: 0.92em; }
+
+.card {
+  background: var(--azure-light-gray);
+  padding: 16px 18px;
+  border-radius: 10px;
+  margin: 10px 0;
+  border-left: 4px solid var(--azure-blue);
+  box-shadow: 0 4px 18px rgba(0, 90, 158, 0.08);
+}
+.card.green { border-left-color: var(--success); }
+.card.yellow { border-left-color: var(--warning); }
+.card.red { border-left-color: var(--danger); }
+.card.cyan { border-left-color: var(--azure-cyan); }
+.card.orange { border-left-color: var(--qpy-orange); background: var(--qpy-orange-light); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 14px 0; }
+.grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.badge {
+  display: inline-block;
+  background: var(--azure-blue); color: white;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 0.8em; font-weight: 600;
+}
+.badge.orange { background: var(--qpy-orange); }
+.badge.navy { background: var(--azure-navy); }
+.badge.success { background: var(--success); }
+.badge.warning { background: var(--warning); color: #1f2937; }
+.badge.danger { background: var(--danger); }
+
+.comparison-table { width: 100%; border-collapse: collapse; font-size: 0.94em; margin: 12px 0; }
+.comparison-table th {
+  background: linear-gradient(135deg, var(--azure-dark-blue), var(--azure-blue));
+  color: white; padding: 12px; text-align: left;
+}
+.comparison-table td { padding: 12px; border-bottom: 1px solid var(--azure-border); vertical-align: top; }
+.comparison-table tr:nth-child(even) { background: #F9FCFF; }
+.pain-cell { color: var(--danger); font-weight: 600; }
+.fix-cell { color: var(--azure-blue); font-weight: 600; }
+
+.metric-box {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--azure-blue), var(--azure-cyan));
+  color: var(--azure-navy);
+  padding: 12px 20px; border-radius: 10px;
+  font-size: 1.18em; font-weight: 700;
+  margin: 8px 8px 8px 0;
+}
+
+.emphasis {
+  font-size: 1em; font-weight: 600;
+  color: var(--azure-dark-blue);
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: rgba(0,120,212,0.08);
+  border-left: 4px solid var(--azure-blue);
+  border-radius: 6px;
+}
+.emphasis.orange {
+  color: var(--qpy-orange-dark);
+  background: rgba(255,107,53,0.08);
+  border-left-color: var(--qpy-orange);
+}
+
+.arch-panel {
+  background: linear-gradient(180deg, #ffffff, #f7fbff);
+  border: 1px solid var(--azure-border);
+  border-radius: 12px;
+  padding: 18px; margin: 14px 0;
+}
+
+.highlight { background: rgba(80,230,255,0.22); padding: 2px 6px; border-radius: 4px; color: var(--azure-ink); font-weight: 600; }
+.highlight.orange { background: rgba(255,107,53,0.20); color: var(--qpy-orange-dark); }
+
+.kpi-tile {
+  background: linear-gradient(135deg, #fff, #f7fbff);
+  border-radius: 14px; padding: 24px;
+  text-align: center;
+  border: 1px solid var(--azure-border);
+  box-shadow: 0 6px 24px rgba(0,90,158,0.10);
+  display: flex; flex-direction: column; justify-content: center;
+  min-height: 200px;
+}
+.kpi-tile .num { font-size: 2.6em; font-weight: 800; line-height: 1.1; }
+.kpi-tile.orange .num { color: var(--qpy-orange); }
+.kpi-tile.blue .num { color: var(--azure-blue); }
+.kpi-tile.cyan .num { color: var(--azure-cyan); -webkit-text-stroke: 1px var(--azure-blue); }
+.kpi-tile .label { font-size: 1.05em; font-weight: 600; color: var(--azure-navy); margin-top: 12px; }
+.kpi-tile .desc { font-size: 0.85em; color: var(--azure-gray); margin-top: 6px; }
+
+.timeline {
+  display: flex; justify-content: space-between; align-items: center;
+  margin: 24px 0; position: relative;
+}
+.timeline::before {
+  content: ""; position: absolute; top: 45px;
+  left: 5%; right: 5%; height: 4px;
+  background: linear-gradient(90deg, var(--azure-blue), var(--qpy-orange));
+  z-index: 0;
+}
+.timeline-node {
+  position: relative; z-index: 1;
+  background: white; border: 3px solid var(--azure-blue);
+  border-radius: 50%; width: 90px; height: 90px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  font-weight: 700; color: var(--azure-blue);
+  box-shadow: 0 4px 16px rgba(0,120,212,0.20);
+  flex-shrink: 0;
+}
+.timeline-node.orange { border-color: var(--qpy-orange); color: var(--qpy-orange-dark); }
+.timeline-node .yr { font-size: 1.0em; }
+.timeline-node .lbl { font-size: 0.62em; color: var(--azure-gray); margin-top: 2px; text-align: center; }
+.timeline-cap {
+  flex: 1; text-align: center;
+  padding: 0 12px; font-size: 0.86em; color: var(--azure-gray);
+  line-height: 1.5;
+}
+
+.pain-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 40px 1fr;
+  align-items: center; gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--azure-border);
+}
+.pain-row:last-child { border-bottom: none; }
+.pain-row .pid {
+  background: var(--qpy-orange); color: white;
+  border-radius: 50%; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.0em;
+}
+.pain-row .pdesc { font-size: 0.96em; color: var(--azure-ink); font-weight: 500; }
+.pain-row .parrow { color: var(--azure-blue); font-size: 1.4em; text-align: center; font-weight: 700; }
+.pain-row .ffix { font-size: 0.96em; color: var(--azure-dark-blue); font-weight: 600; }
+
+.agent-card {
+  background: white; border: 1px solid var(--azure-border);
+  border-radius: 10px; padding: 14px 10px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,120,212,0.06);
+  position: relative;
+}
+.agent-card.star { border: 2px solid var(--qpy-orange); background: #fffaf6; }
+.agent-card .av { font-size: 2.2em; line-height: 1; margin-bottom: 4px; }
+.agent-card .nm { font-weight: 700; color: var(--azure-navy); font-size: 0.86em; }
+.agent-card .role { font-size: 0.72em; color: var(--azure-gray); margin-top: 4px; }
+.agent-card .star-mark { position: absolute; top: 4px; right: 6px; color: var(--qpy-orange); font-size: 0.9em; }
+
+.fde-hub { position: relative; width: 100%; max-width: 760px; height: 340px; margin: 10px auto; }
+.fde-center {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--qpy-orange), var(--qpy-orange-dark));
+  color: white; display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center; font-weight: 700;
+  box-shadow: 0 12px 40px rgba(255,107,53,0.30);
+}
+.fde-center .fde-em { font-size: 3em; line-height: 1; }
+.fde-center .fde-nm { font-size: 1.3em; margin-top: 6px; }
+.fde-center .fde-sub { font-size: 0.78em; opacity: 0.92; margin-top: 4px; }
+.fde-bubble {
+  position: absolute; width: 180px;
+  background: white; border-radius: 12px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--azure-blue);
+  box-shadow: 0 6px 20px rgba(0,90,158,0.12);
+  font-size: 0.84em; color: var(--azure-navy); font-weight: 600;
+  line-height: 1.45;
+}
+.fde-bubble.tl { left: 0; top: 5%; }
+.fde-bubble.tr { right: 0; top: 5%; }
+.fde-bubble.bl { left: 0; bottom: 5%; }
+.fde-bubble.br { right: 0; bottom: 5%; }
+
+.flow-line {
+  display: flex; align-items: stretch; justify-content: space-between;
+  margin: 18px 0; flex-wrap: nowrap; gap: 4px;
+}
+.flow-step {
+  background: white; border: 1px solid var(--azure-border);
+  border-radius: 10px; padding: 12px 8px;
+  text-align: center; min-width: 90px;
+  font-size: 0.82em; font-weight: 600; color: var(--azure-navy);
+  box-shadow: 0 3px 12px rgba(0,120,212,0.08);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.flow-step.orange { border: 2px solid var(--qpy-orange); color: var(--qpy-orange-dark); }
+.flow-step.parallel {
+  background: linear-gradient(135deg, var(--qpy-orange-light), white);
+  border: 2px dashed var(--qpy-orange);
+  min-width: 110px;
+  font-size: 0.78em;
+}
+.flow-arrow { color: var(--azure-blue); font-size: 1.4em; font-weight: 700; display: flex; align-items: center; }
+
+.time-chip {
+  display: inline-block;
+  background: rgba(255,255,255,0.92);
+  color: var(--qpy-orange-dark); padding: 8px 20px; border-radius: 30px;
+  font-weight: 700; font-size: 1.0em;
+}
+
+.mock {
+  background: linear-gradient(160deg, #1F2937 0%, #243A5E 100%);
+  color: #fff; padding: 16px;
+  border-radius: 10px;
+  font-family: "SF Mono", "Consolas", monospace;
+  min-height: 220px;
+  display: flex; flex-direction: column;
+}
+.mock .bar { display: flex; gap: 6px; margin-bottom: 12px; }
+.mock .bar span { width: 11px; height: 11px; border-radius: 50%; background: #888; }
+.mock .bar span:nth-child(1) { background: #ff5f56; }
+.mock .bar span:nth-child(2) { background: #ffbd2e; }
+.mock .bar span:nth-child(3) { background: #27c93f; }
+.mock .title { color: var(--qpy-orange); font-weight: 700; margin-bottom: 8px; font-size: 0.92em; }
+.mock .row { background: rgba(255,255,255,0.06); border-radius: 5px; padding: 6px 10px; margin-bottom: 4px; font-size: 0.76em; }
+.mock .row .k { color: var(--azure-cyan); }
+
+.kpi-mini {
+  background: linear-gradient(135deg, var(--qpy-orange), #ff8b5e);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 700;
+}
+.kpi-mini .v { font-size: 1.4em; line-height: 1.1; }
+.kpi-mini .l { font-size: 0.7em; font-weight: 500; opacity: 0.95; margin-top: 4px; }
+
+.cover-wrap {
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  height: calc(100vh - 90px - 48px);
+  text-align: center; padding: 0 40px;
+}
+.cover-wrap h1 {
+  font-size: 3.4em; border: none; color: white;
+  margin-bottom: 24px; padding-bottom: 0;
+}
+.cover-wrap .double {
+  background: linear-gradient(90deg, var(--qpy-orange), var(--azure-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cover-wrap h2 {
+  font-size: 1.6em; color: var(--qpy-orange); margin-bottom: 14px;
+}
+.cover-wrap .meta { margin-top: 50px; color: #dbeafe; font-size: 1.05em; }
+.cover-wrap .logos {
+  margin-top: 36px; display: flex; gap: 24px;
+  align-items: center; opacity: 0.92;
+}
+.cover-wrap .logo-chip {
+  background: rgba(255,255,255,0.10);
+  padding: 10px 22px; border-radius: 26px;
+  border: 1px solid rgba(255,255,255,0.20);
+  color: white; font-weight: 600;
+}
+
+.tri-num { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin: 30px 0; }
+.tri-num .item { text-align: center; }
+.tri-num .item .n {
+  font-size: 6em; font-weight: 800; line-height: 1;
+  background: linear-gradient(135deg, var(--qpy-orange), var(--qpy-orange-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tri-num .item .n.blue {
+  background: linear-gradient(135deg, var(--azure-blue), var(--azure-dark-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tri-num .item .n.cyan {
+  background: linear-gradient(135deg, var(--azure-blue), var(--azure-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tri-num .item h3 { color: var(--azure-navy); font-size: 1.1em; margin: 6px 0; }
+.tri-num .item p { font-size: 0.84em; }
+
+.demo-band {
+  background: linear-gradient(90deg, var(--qpy-orange), var(--qpy-orange-dark));
+  color: white; padding: 18px 24px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.demo-band .tag { font-size: 0.82em; opacity: 0.92; }
+.demo-band .ttl { font-size: 1.7em; font-weight: 700; margin-top: 2px; }
+
+.aidlc-wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px 14px; margin: 16px 0;
+}
+.aidlc-step {
+  background: white; border: 2px solid var(--azure-blue);
+  border-radius: 12px; padding: 16px 12px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 3px 12px rgba(0,120,212,0.08);
+}
+.aidlc-step .em { font-size: 2.0em; line-height: 1; }
+.aidlc-step .stp { color: var(--azure-blue); font-weight: 700; font-size: 1.05em; margin: 6px 0; }
+.aidlc-step .ag { color: var(--qpy-orange-dark); font-size: 0.78em; font-weight: 600; }
+.aidlc-step .arrow {
+  position: absolute; right: -18px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--azure-blue); font-size: 1.6em; font-weight: 700;
+  z-index: 2;
+}
+.aidlc-step.last .arrow { display: none; }
+
+.harness-stack { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.harness-layer {
+  background: white; border-radius: 12px;
+  padding: 18px 22px;
+  border: 1px solid var(--azure-border);
+  display: grid; grid-template-columns: 90px 1fr 1.4fr; gap: 18px;
+  align-items: center;
+}
+.harness-layer .tag {
+  font-size: 1.4em; font-weight: 800; text-align: center;
+}
+.harness-layer.workflow { background: linear-gradient(90deg, var(--qpy-orange-light), white); border-left: 6px solid var(--qpy-orange); }
+.harness-layer.roles { background: linear-gradient(90deg, #e8f4fd, white); border-left: 6px solid var(--azure-blue); }
+.harness-layer.rules { background: linear-gradient(90deg, #e8f0f7, white); border-left: 6px solid var(--azure-navy); }
+.harness-layer.workflow .tag { color: var(--qpy-orange); }
+.harness-layer.roles .tag { color: var(--azure-blue); }
+.harness-layer.rules .tag { color: var(--azure-navy); }
+.harness-layer .nm { font-weight: 700; color: var(--azure-ink); font-size: 1.0em; }
+.harness-layer .desc { color: var(--azure-gray); font-size: 0.86em; }
+.harness-layer .file { font-family: "SF Mono","Consolas",monospace; font-size: 0.8em; color: var(--azure-blue); margin-top: 4px; }
+
+.prompt-card {
+  background: white;
+  border: 1px solid var(--azure-border);
+  border-radius: 10px; padding: 14px;
+  box-shadow: 0 3px 12px rgba(0,120,212,0.08);
+}
+.prompt-card .cmd {
+  font-family: "SF Mono", "Consolas", monospace;
+  background: var(--azure-navy); color: var(--azure-cyan);
+  padding: 6px 12px; border-radius: 6px;
+  font-size: 0.88em; font-weight: 700;
+  display: inline-block; margin-bottom: 8px;
+}
+.prompt-card .io { font-size: 0.82em; color: var(--azure-gray); line-height: 1.5; }
+
+.cta-card {
+  background: linear-gradient(135deg, #fff, #f7fbff);
+  border-top: 4px solid var(--qpy-orange);
+  border-radius: 12px; padding: 18px;
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(0,90,158,0.10);
+}
+.cta-card .ord {
+  background: var(--qpy-orange); color: white;
+  border-radius: 50%; width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; margin-bottom: 8px;
+}
+.cta-card .tt { font-weight: 700; color: var(--azure-navy); font-size: 1.0em; margin-bottom: 6px; }
+.cta-card .ds { font-size: 0.83em; color: var(--azure-gray); }
+
+.qa-block { text-align: center; padding: 30px 20px; margin-top: 24px; }
+.qa-block .qa {
+  font-size: 5.5em; font-weight: 800;
+  background: linear-gradient(90deg, var(--qpy-orange), var(--azure-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.2em;
+}
+.qa-block .sub { color: var(--azure-gray); font-size: 1.1em; margin-top: 8px; }
+
+.logo {
+  position: fixed; top: 16px; left: 24px; z-index: 100;
+  color: white; font-weight: 700; font-size: 0.92em;
+  background: rgba(36,58,94,0.78);
+  padding: 6px 14px; border-radius: 18px;
+  backdrop-filter: blur(8px);
+}
+.slide-counter {
+  position: fixed; top: 16px; right: 24px; z-index: 100;
+  color: white; font-weight: 600; font-size: 0.92em;
+  background: rgba(36,58,94,0.78);
+  padding: 6px 14px; border-radius: 18px;
+  backdrop-filter: blur(8px);
+}
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 4px; width: 0;
+  background: linear-gradient(90deg, var(--azure-cyan), var(--qpy-orange));
+  z-index: 200; transition: width 0.4s ease;
+}
+.navigation {
+  position: fixed; bottom: 22px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 10px; z-index: 100;
+  background: rgba(36,58,94,0.92);
+  padding: 10px 18px; border-radius: 50px;
+  backdrop-filter: blur(8px);
+}
+.nav-btn {
+  background: var(--azure-blue);
+  border: none; color: white;
+  width: 40px; height: 40px; border-radius: 50%;
+  cursor: pointer; font-size: 1.1em;
+  transition: all 0.25s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-btn:hover { background: var(--qpy-orange); transform: scale(1.10); }
+.nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.slide.active > * { animation: slideIn 0.45s ease-out backwards; }
+.slide.active > *:nth-child(1) { animation-delay: 0.08s; }
+.slide.active > *:nth-child(2) { animation-delay: 0.16s; }
+.slide.active > *:nth-child(3) { animation-delay: 0.22s; }
+.slide.active > *:nth-child(4) { animation-delay: 0.28s; }
+.slide.active > *:nth-child(5) { animation-delay: 0.34s; }
+.slide.active > *:nth-child(6) { animation-delay: 0.40s; }
+
+@media print {
+  html, body { height: auto; overflow: visible; background: white; }
+  .slide-container { height: auto; }
+  .slide {
+    position: relative !important;
+    transform: none !important; opacity: 1 !important;
+    page-break-after: always;
+    width: 100%; min-height: 100vh;
+    max-height: none;
+  }
+  .navigation, .progress-bar, .slide-counter, .logo { display: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="logo">🎤 趣配音 × 🐙 GitHub Copilot</div>
+<div class="slide-counter" id="slideCounter">1 / 17</div>
+<div class="slide-container">
+<div class="slide cover active">
+  <div class="cover-wrap">
+    <h1><span class="double">AI Native Coding</span> × <span class="double">业务可视化</span></h1>
+    <h2>为趣配音定制的一小时 · FDE Briefing · 2026</h2>
+    <p style="color:#dbeafe; font-size:1.05em; max-width:760px; margin:20px auto 0;">
+      不讲 AI 大词,只做一件事——把 GitHub Copilot 怎么落到<br>
+      教研、班级、审核三条业务线上,当着大家的面跑给你们看
+    </p>
+    <div class="logos">
+      <div class="logo-chip">🎤 趣配音</div>
+      <div class="logo-chip">🐙 GitHub Copilot</div>
+      <div class="logo-chip">☁️ Microsoft</div>
+    </div>
+    <div class="meta">
+      <p><strong>主讲 · FDE 团队  ·  60 分钟现场交流</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide">
+  <h1>今天 60 分钟,你将看到 3 件事</h1>
+  <div class="grid cols-3" style="margin-top:30px;">
+    <div class="kpi-tile orange">
+      <div class="num">30 min <span style="color:var(--azure-blue);">→</span> 5 s</div>
+      <div class="label">📚 教研老师打一条素材标签</div>
+      <div class="desc">从手工 30 分钟,压缩到 AI 5 秒</div>
+    </div>
+    <div class="kpi-tile blue">
+      <div class="num">2 周 <span style="color:var(--qpy-orange);">→</span> 30 s</div>
+      <div class="label">📊 业务现场提一个新指标</div>
+      <div class="desc">看板上线时间从两周降到半分钟</div>
+    </div>
+    <div class="kpi-tile cyan">
+      <div class="num">1 Issue <span style="color:var(--qpy-orange);">→</span> 1 PR</div>
+      <div class="label">🛠️ IT 一个审核需求</div>
+      <div class="desc">5 个 Agent 接力,8 分钟跑完设计到发布</div>
+    </div>
+  </div>
+  <div class="emphasis orange">
+    三件事,三个数字,今天全部 <span class="highlight orange">当场跑</span>,不是 PPT 表演
+  </div>
+</div>
+<div class="slide">
+  <h1>趣配音 5 个真实痛点 × Copilot 精准回应</h1>
+  <small style="color:var(--azure-gray);">数据来源:FDE 与教研主任、平台研发负责人三轮访谈纪要</small>
+  <div style="margin-top:14px;">
+    <div class="pain-row">
+      <div class="pid">①</div>
+      <div class="pdesc">教研入库慢 · 8 位老师经验全靠 Excel</div>
+      <div class="parrow">➜</div>
+      <div class="ffix"><code>.prompt.md</code> 5 秒打标,经验沉淀进 git</div>
+    </div>
+    <div class="pain-row">
+      <div class="pid">②</div>
+      <div class="pdesc">班级看板改一次要排期 2 周</div>
+      <div class="parrow">➜</div>
+      <div class="ffix">Agent Mode 30 秒改前端,F5 上线</div>
+    </div>
+    <div class="pain-row">
+      <div class="pid">③</div>
+      <div class="pdesc">内容审核串行评审,平均 2 天</div>
+      <div class="parrow">➜</div>
+      <div class="ffix">3 个 Agent 并行,30 秒拿到 3 份报告</div>
+    </div>
+    <div class="pain-row">
+      <div class="pid">④</div>
+      <div class="pdesc">老师离职,判定规则随人走</div>
+      <div class="parrow">➜</div>
+      <div class="ffix">git 版本管理 prompt,工艺不丢</div>
+    </div>
+    <div class="pain-row">
+      <div class="pid">⑤</div>
+      <div class="pdesc">新工程师入职上手慢</div>
+      <div class="parrow">➜</div>
+      <div class="ffix">6 个 prompt 模板 = 团队 SOP 培训手册</div>
+    </div>
+  </div>
+  <div class="emphasis">
+    每一行右边的回应,都对应今天 3 个 Demo 中的具体环节——
+    <span class="highlight">您可以随时让讲师跳到对应章节</span>
+  </div>
+</div>
+<div class="slide">
+  <h1>Copilot 三次跃迁:Completions → Chat → Agent</h1>
+  <div class="timeline">
+    <div class="timeline-node">
+      <div class="yr">2021</div>
+      <div class="lbl">Completions</div>
+    </div>
+    <div class="timeline-cap">补全单行代码<br>键入即提示</div>
+    <div class="timeline-node">
+      <div class="yr">2023</div>
+      <div class="lbl">Chat</div>
+    </div>
+    <div class="timeline-cap">对话写函数<br>解释 / 重构 / 修 bug</div>
+    <div class="timeline-node orange">
+      <div class="yr">2025</div>
+      <div class="lbl">Agent</div>
+    </div>
+  </div>
+  <div class="grid cols-3" style="margin-top:20px;">
+    <div class="card">
+      <h3>📝 第 1 代:Completions</h3>
+      <p>IDE 内单行补全,基于光标上下文猜测下一行代码,大幅提升敲键速度。</p>
+    </div>
+    <div class="card cyan">
+      <h3>💬 第 2 代:Chat</h3>
+      <p>对话式生成完整函数、解释代码、定位 bug,IDE 内置面板就能完成。</p>
+    </div>
+    <div class="card orange">
+      <h3>🤖 第 3 代:Agent</h3>
+      <p><strong>跨文件编辑 + 自跑命令 + 按测试结果回头修代码 + 多 Agent 并行。</strong></p>
+    </div>
+  </div>
+  <div class="emphasis orange">
+    今天三个 Demo 跑的 <span class="highlight orange">全部是 Agent 模式</span>——不是补全,是自主完成任务
+  </div>
+</div>
+<div class="slide">
+  <h1>AI-DLC:需求到上线的 6 阶段闭环</h1>
+  <p>AI Native 研发生命周期 — 每个阶段都有专属 Agent 守工程纪律</p>
+  <div class="aidlc-wrap" style="margin-top:18px;">
+    <div class="aidlc-step">
+      <div class="em">📋</div>
+      <div class="stp">① 需求</div>
+      <div class="ag">@product-reviewer</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="aidlc-step">
+      <div class="em">🏗️</div>
+      <div class="stp">② 设计</div>
+      <div class="ag">@architect</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="aidlc-step">
+      <div class="em">💻</div>
+      <div class="stp">③ 编码</div>
+      <div class="ag">Agent Mode</div>
+      <div class="arrow">↓</div>
+    </div>
+    <div class="aidlc-step last">
+      <div class="em">🧪</div>
+      <div class="stp">④ 测试</div>
+      <div class="ag">@test-engineer</div>
+    </div>
+    <div class="aidlc-step">
+      <div class="em">🔍</div>
+      <div class="stp">⑤ 评审</div>
+      <div class="ag">@code-reviewer + @red-team + @security</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="aidlc-step last">
+      <div class="em">🚀</div>
+      <div class="stp">⑥ 发布</div>
+      <div class="ag">@release-engineer</div>
+    </div>
+  </div>
+  <div class="emphasis">
+    <strong>闭环中心 = Copilot 守纪律</strong> · Demo 3 您将看到这个圆环
+    <span class="highlight">一次跑完 5 个 Agent 接力</span>
+  </div>
+</div>
+<div class="slide">
+  <h1>为什么是 GHCP:三个企业级硬理由</h1>
+  <div class="grid cols-3" style="margin-top:20px;">
+    <div class="card">
+      <h3 style="text-align:center; font-size:2.6em; margin-bottom:8px;">🏢</h3>
+      <h3 style="text-align:center;">① 仓库感知 · Repo-Aware</h3>
+      <p style="text-align:center;">Copilot 自动读取 <code>.github/copilot-instructions.md</code>,把公司规则<strong>倒灌进每次会话</strong>。</p>
+      <p style="text-align:center; color:var(--azure-blue); font-weight:600;">→ 不需要每次重写 system prompt</p>
+    </div>
+    <div class="card green">
+      <h3 style="text-align:center; font-size:2.6em; margin-bottom:8px;">🔐</h3>
+      <h3 style="text-align:center;">② 数据不出企业边界</h3>
+      <p style="text-align:center;">SOC2 Type II + ISO 27001 + EU 数据驻留;代码和提示词都在 GitHub Enterprise 内。</p>
+      <p style="text-align:center; color:var(--success); font-weight:600;">→ 满足等保 · 满足合规审计</p>
+    </div>
+    <div class="card orange">
+      <h3 style="text-align:center; font-size:2.6em; margin-bottom:8px;">🔀</h3>
+      <h3 style="text-align:center;">③ 多模型路由</h3>
+      <p style="text-align:center;">Claude / GPT / Gemini 同一界面切换;<strong>模型不绑死</strong>,新模型上线无切换成本。</p>
+      <p style="text-align:center; color:var(--qpy-orange-dark); font-weight:600;">→ 旧推理留 GPT,代码主力 Claude</p>
+    </div>
+  </div>
+  <div class="emphasis">
+    🏛️ <strong>GitHub Enterprise + Microsoft Azure</strong> 双重审计 ·
+    每一次 Agent 操作都有 <span class="highlight">可追溯日志 + IAM 控制</span>
+  </div>
+</div>
+<div class="slide">
+  <div class="demo-band">
+    <div>
+      <div class="tag">DEMO 1 · 12 分钟</div>
+      <div class="ttl">配音素材自动打标签</div>
+    </div>
+    <div class="time-chip">⏱ 12 min</div>
+  </div>
+  <p><strong>场景</strong>:资深教研老师每天给新上架英文配音素材打 4 类标签(年级/题材/难度/推荐分)。原 30 分钟/条 · AI 5 秒/条</p>
+  <div class="grid cols-2" style="margin-top:10px;">
+    <div class="mock">
+      <div class="bar"><span></span><span></span><span></span></div>
+      <div class="title">🎤 配音素材自动打标签 · Streamlit</div>
+      <div class="row"><span class="k">▸</span> 📄 单条打标 | 📦 批量打标 | 📜 .prompt.md | 🗂 历史</div>
+      <div class="row"><span class="k">素材:</span> "Frozen · Let It Go · Sing-along"</div>
+      <div class="row"><span class="k">模型:</span> claude-opus-4.8</div>
+      <div class="row"><span class="k">▸</span> 🚀 AI 打标签 → <span style="color:#50E6FF;">5 秒后弹出 4 张彩色卡片</span></div>
+      <div class="row"><span class="k">结果:</span> 年级 G3-G4 · 题材 童话 · 难度 ★★ · 推荐 92</div>
+    </div>
+    <div>
+      <h3>🌟 三个哇点</h3>
+      <div class="card cyan"><strong>✨ 5 秒出卡片</strong><br/>点 🚀,5 秒内右侧弹出 4 张彩色标签卡(年级/题材/难度/推荐分)</div>
+      <div class="card cyan"><strong>✨ 30 秒批量 10 条</strong><br/>进度条平滑跑完,表格全展示,CSV 一键下载</div>
+      <div class="card orange"><strong>✨ .prompt.md = 教研资产</strong><br/>切到第 3 个 tab,展示 8 位老师的判定规则全在一个 markdown 里、git 版本管理</div>
+    </div>
+  </div>
+  <div class="emphasis orange">
+    🎯 <strong>公问</strong>:在座的教研负责人,你们现在有几位资深老师在做这件事?
+    如果把他们的经验都搬进 <code>.prompt.md</code>,你愿意把它放进 git 让<span class="highlight orange">全教研团队 review</span>吗?
+  </div>
+</div>
+<div class="slide">
+  <h1>Demo 1 复盘 · 3 prompt + 6 工具调用 + 0 行手写</h1>
+  <div class="tri-num">
+    <div class="item">
+      <div class="n">3</div>
+      <h3>段自然语言 Prompt</h3>
+      <p>从打标到查库到展示,全部口述</p>
+    </div>
+    <div class="item">
+      <div class="n blue">6</div>
+      <h3>次工具调用</h3>
+      <p>读文件 · 查 schema · 写 JSON<br>入 SQLite · 生成 CSV · 刷 UI</p>
+    </div>
+    <div class="item">
+      <div class="n cyan">0</div>
+      <h3>行 Python 手写</h3>
+      <p>教研老师没碰键盘写代码</p>
+    </div>
+  </div>
+  <div class="grid cols-2" style="margin-top:18px;">
+    <div class="card cyan">
+      <h3>🗃️ 数据沉淀链路</h3>
+      <p>Streamlit UI → LiteLLM(多模型) → claude-opus-4.8 → JSON Schema 严格校验 → SQLite 历史记录 → CSV 下载导出</p>
+    </div>
+    <div class="card green">
+      <h3>🛡️ 三级 fallback 保现场</h3>
+      <p><strong>① ideal_tags.json</strong>(预生成)→ <strong>② 启发式规则</strong>(关键字匹配)→ <strong>③ 在线 LLM</strong>,任意网络环境都能跑</p>
+    </div>
+  </div>
+  <div class="emphasis orange">
+    📌 这就是 <strong>AI Native 业务化</strong> 的样子:业务人员说人话,Copilot 把它变成可运行系统
+  </div>
+</div>
+<div class="slide">
+  <h1>三层 Harness:给 AI 套上的"缰绳"</h1>
+  <p>Harness = 马具 · 让 Agent 在工程纪律内自主工作,不脱缰</p>
+  <div class="harness-stack">
+    <div class="harness-layer workflow">
+      <div class="tag">上层</div>
+      <div>
+        <div class="nm">Workflow · 流程模板</div>
+        <div class="file">.github/prompts/*.prompt.md (6 个)</div>
+      </div>
+      <div class="desc">把团队最佳实践编成可调用的 slash command — <code>/design-feature</code> · <code>/ship-release</code></div>
+    </div>
+    <div class="harness-layer roles">
+      <div class="tag">中层</div>
+      <div>
+        <div class="nm">Roles · 角色定义</div>
+        <div class="file">.github/agents/*.md (10 个)</div>
+      </div>
+      <div class="desc">定义每个 Agent 的边界 — architect 不写代码 · security 不做架构决策</div>
+    </div>
+    <div class="harness-layer rules">
+      <div class="tag">底层</div>
+      <div>
+        <div class="nm">Rules · 项目纪律</div>
+        <div class="file">.github/copilot-instructions.md</div>
+      </div>
+      <div class="desc">告诉 AI 这家公司不准做什么 — 不允许 console.log 上线 · 不允许跳过 review</div>
+    </div>
+  </div>
+  <div class="emphasis">
+    📦 <strong>三个文件夹,整个工程文化就被复制 N 倍</strong> · 新仓库 clone 模板 = 标准化研发文化
+  </div>
+</div>
+<div class="slide">
+  <h1>10 个专家 Agent 阵容 · Demo 3 会用到 ⭐ 6 个</h1>
+  <div class="grid cols-4" style="grid-template-columns: repeat(5,1fr); margin-top:14px;">
+    <div class="agent-card star">
+      <div class="star-mark">⭐</div>
+      <div class="av">🏗️</div>
+      <div class="nm">architect</div>
+      <div class="role">出架构图 + API 表</div>
+    </div>
+    <div class="agent-card">
+      <div class="av">📋</div>
+      <div class="nm">product-reviewer</div>
+      <div class="role">需求拆解 + 验收</div>
+    </div>
+    <div class="agent-card star">
+      <div class="star-mark">⭐</div>
+      <div class="av">🔍</div>
+      <div class="nm">code-reviewer</div>
+      <div class="role">PR 评审 + 质量门禁</div>
+    </div>
+    <div class="agent-card star">
+      <div class="star-mark">⭐</div>
+      <div class="av">🧪</div>
+      <div class="nm">test-engineer</div>
+      <div class="role">单测 + 覆盖率</div>
+    </div>
+    <div class="agent-card star">
+      <div class="star-mark">⭐</div>
+      <div class="av">🎯</div>
+      <div class="nm">red-team</div>
+      <div class="role">攻击面 + 边界对抗</div>
+    </div>
+    <div class="agent-card star">
+      <div class="star-mark">⭐</div>
+      <div class="av">🔐</div>
+      <div class="nm">security-reviewer</div>
+      <div class="role">SAST + 合规检查</div>
+    </div>
+    <div class="agent-card">
+      <div class="av">⚡</div>
+      <div class="nm">performance-engineer</div>
+      <div class="role">性能 + Profile</div>
+    </div>
+    <div class="agent-card star">
+      <div class="star-mark">⭐</div>
+      <div class="av">🚀</div>
+      <div class="nm">release-engineer</div>
+      <div class="role">CHANGELOG + PR 模板</div>
+    </div>
+    <div class="agent-card">
+      <div class="av">📝</div>
+      <div class="nm">doc-writer</div>
+      <div class="role">README + 用户手册</div>
+    </div>
+    <div class="agent-card">
+      <div class="av">🕵️</div>
+      <div class="nm">investigator</div>
+      <div class="role">线上事故根因排查</div>
+    </div>
+  </div>
+  <div class="grid cols-2" style="margin-top:20px;">
+    <div class="card">
+      <h3>不是 10 个 Prompt</h3>
+      <p>是 10 份带<strong>边界 + 输出格式 + 协作规则</strong>的硬约束 — Markdown 文件 + git 版本管理</p>
+    </div>
+    <div class="card orange">
+      <h3>Demo 3 现场召唤 6 个</h3>
+      <p><strong>@architect → Agent Mode → @test-engineer → @code-reviewer + @red-team + @security-reviewer → @release-engineer</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide">
+  <h1>⭐ FDE Agent · 客户身边"会写代码的产品经理"</h1>
+  <p>Forward Deployed Engineer — OpenAI / Palantir 都在重金投资的角色</p>
+  <div class="fde-hub">
+    <div class="fde-bubble tl">📖 读懂业务术语<br/>"年级 / 班级 / 完成率 / 推荐分"</div>
+    <div class="fde-bubble tr">🎼 调度 10 Agent<br/>知道哪个场景该召谁</div>
+    <div class="fde-bubble bl">⚡ 30 分钟出可演示 Demo<br/>不是 PPT,是能跑的代码</div>
+    <div class="fde-bubble br">🤝 跟客户面对面坐<br/>真实工位 · 真实需求</div>
+    <div class="fde-center">
+      <div class="fde-em">🎯</div>
+      <div class="fde-nm">FDE</div>
+      <div class="fde-sub">Forward Deployed<br/>Engineer</div>
+    </div>
+  </div>
+  <div class="emphasis orange">
+    🏆 <strong>"不是远程顾问,是你工位旁边的工程师"</strong> · 今天讲师两位就是 FDE,这一小时也是 FDE 现场服务的样板
+  </div>
+</div>
+<div class="slide">
+  <h1>6 个 Prompt 模板 = 团队最佳实践的可执行沉淀</h1>
+  <p>每个 slash command 都是一份团队 SOP · 复制粘贴即用 · git 版本管理 · 全员复用</p>
+  <div class="grid cols-3" style="margin-top:18px;">
+    <div class="prompt-card">
+      <div class="cmd">/design-feature</div>
+      <div class="io"><strong>输入</strong>:一句业务需求<br/><strong>输出</strong>:ASCII 架构图 + API 表 + 数据模型 + 风险清单</div>
+    </div>
+    <div class="prompt-card">
+      <div class="cmd">/code-review</div>
+      <div class="io"><strong>输入</strong>:PR diff<br/><strong>输出</strong>:行内评论 + 必改 / 建议改 / 表扬三档</div>
+    </div>
+    <div class="prompt-card">
+      <div class="cmd">/fix-bug</div>
+      <div class="io"><strong>输入</strong>:错误日志 + 复现路径<br/><strong>输出</strong>:根因分析 + 补丁代码 + 回归测试</div>
+    </div>
+    <div class="prompt-card">
+      <div class="cmd">/investigate-issue</div>
+      <div class="io"><strong>输入</strong>:线上事故 ticket<br/><strong>输出</strong>:5why 时间线 + 影响范围 + 改进项</div>
+    </div>
+    <div class="prompt-card">
+      <div class="cmd">/add-endpoint</div>
+      <div class="io"><strong>输入</strong>:接口名 + 字段<br/><strong>输出</strong>:Controller + Service + Schema + OpenAPI 文档</div>
+    </div>
+    <div class="prompt-card">
+      <div class="cmd">/ship-release</div>
+      <div class="io"><strong>输入</strong>:本周合并的 PR 列表<br/><strong>输出</strong>:CHANGELOG + Release Notes + 公告稿</div>
+    </div>
+  </div>
+  <div class="emphasis">
+    🎓 <strong>新工程师入职第一周不再问"我们公司怎么写 PR 描述"</strong> · 直接 <code>/ship-release</code> · 老师傅离职,工艺不丢
+  </div>
+</div>
+<div class="slide">
+  <div class="demo-band">
+    <div>
+      <div class="tag">DEMO 2 · 10 分钟</div>
+      <div class="ttl">班级作业看板 · 现场加指标</div>
+    </div>
+    <div class="time-chip">⏱ 10 min</div>
+  </div>
+  <p style="font-size:0.92em; margin-top:4px;"><strong>场景</strong>:G4-3 班英语老师每天看完成率 / 均分 / 待补做学生 / 最受欢迎素材。<strong>教研主任临时加"家长打卡"指标</strong>,看 Copilot 30 秒改完上线</p>
+  <div class="grid cols-2" style="margin-top:8px;">
+    <div class="mock">
+      <div class="bar"><span></span><span></span><span></span></div>
+      <div class="title">📊 班级作业看板 · FastAPI + ECharts</div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:6px 0;">
+        <div class="kpi-mini"><div class="v">500</div><div class="l">本周提交</div></div>
+        <div class="kpi-mini"><div class="v">60%</div><div class="l">完成率</div></div>
+        <div class="kpi-mini"><div class="v">82</div><div class="l">均分</div></div>
+        <div class="kpi-mini"><div class="v">9</div><div class="l">待补做</div></div>
+      </div>
+      <div class="row"><span class="k">▸</span> 班级筛选: G4-3 ▾ · 时间: 近 7 天</div>
+      <div class="row"><span class="k">▸</span> 完成率柱状图 / 均分趋势 / 待补做榜单 / 受欢迎素材饼图</div>
+    </div>
+    <div>
+      <div style="background:linear-gradient(135deg, var(--qpy-orange), var(--qpy-orange-dark)); color:white; padding:14px 18px; border-radius:10px; text-align:center; margin-bottom:10px;">
+        <div style="font-size:0.88em; opacity:0.92;">需求迭代周期</div>
+        <div style="font-size:1.9em; font-weight:800; margin:4px 0; line-height:1.1;">2 周 → 30 秒</div>
+        <div style="font-size:0.78em; opacity:0.92;">提一句中文 · KPI 多出一张卡 · F5 上线</div>
+      </div>
+      <h3 style="margin:6px 0;">🌟 三个哇点</h3>
+      <div class="card cyan" style="padding:8px 12px; margin:5px 0; font-size:0.86em;"><strong>✨ 班级一切立刷</strong>:切 G4-3,4 张图同步刷新,橙色高亮</div>
+      <div class="card orange" style="padding:8px 12px; margin:5px 0; font-size:0.86em;"><strong>✨ 现场加"家长打卡"</strong>(全场最大哇点):对 Agent 说一句中文,15 秒 KPI 多出第 5 张卡</div>
+      <div class="card cyan" style="padding:8px 12px; margin:5px 0; font-size:0.86em;"><strong>✨ F5 见新指标</strong>:橙色 62.3% 跳出,副标题"近 7 天 / 已绑定 81%"</div>
+    </div>
+  </div>
+  <div class="emphasis orange" style="margin-top:8px; padding:10px 14px; font-size:0.92em;">
+    🎯 <strong>公问</strong>:过去半年,您提过几个"临时想加一个指标"的需求?这些需求平均排期多久?
+    如果都能 <span class="highlight orange">30 秒上线</span>,您会怎么用?
+  </div>
+</div>
+<div class="slide">
+  <div class="demo-band">
+    <div>
+      <div class="tag">DEMO 3 · 8 分钟 · IT 部门最爱</div>
+      <div class="ttl">审核服务多 Agent 流水线</div>
+    </div>
+    <div class="time-chip">⏱ 8 min</div>
+  </div>
+  <p><strong>场景</strong>:学生录音方言混入 + 低俗词识别,输出三档风险。<strong>5 个 Copilot Agent 接力</strong>,从 Issue 到 PR 8 分钟跑完</p>
+  <div class="flow-line">
+    <div class="flow-step">📄<br/>ISSUE.md</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step orange">🏗️<br/>@architect</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step orange">💻<br/>Agent Mode</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step orange">🧪<br/>@test-engineer</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step parallel">🔍 @code<br/>🎯 @red-team<br/>🔐 @security<br/><small>并行 30s</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step orange">🚀<br/>@release</div>
+  </div>
+  <div class="grid cols-3" style="margin-top:14px;">
+    <div class="card cyan"><strong>✨ /design-feature 出 ASCII 图</strong><br/>第 1 步,Copilot 不写代码,先按公司流程出架构图 + API 表</div>
+    <div class="card orange"><strong>✨ 三 Chat 并行评审</strong>(IT 最大哇点)<br/>同一秒回车,30 秒拿 code / red-team / security 三份视角报告</div>
+    <div class="card cyan"><strong>✨ release-engineer 出 PR 模板</strong><br/>不真 git commit,出完整 CHANGELOG + PR 描述 + sign-off checkbox</div>
+  </div>
+  <div class="emphasis">
+    🎯 <strong>公问</strong>:贵司一个内容审核 PR 从提交到合并,平均经过几道评审?
+    每道评审现在的平均等待时间是多久?这套<span class="highlight">并行流水线压到 30 秒</span>,您怎么看?
+  </div>
+</div>
+<div class="slide">
+  <h1>三个落地数字 · 8× 速度 / 60% bug 降 / 30% 新人成长</h1>
+  <p>数据来源:GitHub Octoverse 2024 + Microsoft IT 内部基线 + 客户 POC 平均值</p>
+  <div class="tri-num">
+    <div class="item">
+      <div class="n">8×</div>
+      <h3>开发速度</h3>
+      <p>需求 → 上线周期<br/>从 8 周降到 1 周</p>
+      <p style="font-size:0.7em; color:var(--azure-gray); margin-top:6px;">来源:GitHub Octoverse 2024 · 客户 POC 平均</p>
+    </div>
+    <div class="item">
+      <div class="n blue">60%</div>
+      <h3>线上 Bug 下降</h3>
+      <p>test-engineer + security-reviewer<br/>守在上线前每个 PR</p>
+      <p style="font-size:0.7em; color:var(--azure-gray); margin-top:6px;">来源:Microsoft IT 内部基线 12 个月度量</p>
+    </div>
+    <div class="item">
+      <div class="n cyan">30%</div>
+      <h3>新人成长加速</h3>
+      <p>6 个 prompt 模板 = 培训手册<br/>3 个月达原 6 个月水平</p>
+      <p style="font-size:0.7em; color:var(--azure-gray); margin-top:6px;">来源:Accenture / GitHub 联合调研 N=4,867</p>
+    </div>
+  </div>
+  <div class="grid cols-3" style="margin-top:16px;">
+    <div class="card">
+      <h3>📈 速度来源</h3>
+      <p>Agent Mode 并行编辑多文件 + .prompt.md 复用 + AI 起草测试 + 自动 PR 描述</p>
+    </div>
+    <div class="card green">
+      <h3>🛡️ 质量来源</h3>
+      <p>评审环节从单人 → 多视角(code/red-team/security)并行,逃逸 bug 大幅减少</p>
+    </div>
+    <div class="card orange">
+      <h3>🎓 成长来源</h3>
+      <p>新人无需翻 wiki,直接 slash command 调用最佳实践,边写代码边学规范</p>
+    </div>
+  </div>
+  <div class="emphasis orange">
+    📌 <strong>这三个数字您不必相信我们</strong> · 90 天试点期间,以您实际基线 vs 我们交付数据对比为准
+  </div>
+</div>
+<div class="slide">
+  <h1>趣配音 90 天落地路线图</h1>
+  <p>POC → 试点 → 全员 · <strong>FDE 全程在场,您不需要先成立 AI 团队</strong></p>
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:24px; position:relative;">
+    <div style="position:absolute; top:40px; left:8%; right:8%; height:3px; background:linear-gradient(90deg, var(--azure-blue), var(--azure-blue) 66%, var(--qpy-orange)); z-index:0;"></div>
+    <div style="text-align:center; position:relative; z-index:1;">
+      <div style="width:80px; height:80px; margin:0 auto; border-radius:50%; background:white; border:3px solid var(--azure-blue); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--azure-blue); font-weight:800;">
+        <div style="font-size:1.0em;">D0</div>
+        <div style="font-size:0.6em; color:var(--azure-gray); margin-top:2px;">签约</div>
+      </div>
+      <div style="margin-top:12px; font-size:0.85em; line-height:1.45;"><strong>选场景 + 签 NDA</strong><br/>FDE 与教研主任、研发负责人对齐 3 个候选 demo</div>
+    </div>
+    <div style="text-align:center; position:relative; z-index:1;">
+      <div style="width:80px; height:80px; margin:0 auto; border-radius:50%; background:white; border:3px solid var(--azure-blue); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--azure-blue); font-weight:800;">
+        <div style="font-size:1.0em;">D14</div>
+        <div style="font-size:0.6em; color:var(--azure-gray); margin-top:2px;">Demo1 上线</div>
+      </div>
+      <div style="margin-top:12px; font-size:0.85em; line-height:1.45;"><strong>FDE 驻场 5 天</strong><br/>Demo1 打标签真上线<br/>教研 8 位老师真实用</div>
+    </div>
+    <div style="text-align:center; position:relative; z-index:1;">
+      <div style="width:80px; height:80px; margin:0 auto; border-radius:50%; background:white; border:3px solid var(--azure-blue); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--azure-blue); font-weight:800;">
+        <div style="font-size:1.0em;">D45</div>
+        <div style="font-size:0.6em; color:var(--azure-gray); margin-top:2px;">2 场景灰度</div>
+      </div>
+      <div style="margin-top:12px; font-size:0.85em; line-height:1.45;"><strong>教研 + 审核 10% 流量</strong><br/>Demo2 看板加指标<br/>2 个真实班级灰度</div>
+    </div>
+    <div style="text-align:center; position:relative; z-index:1;">
+      <div style="width:80px; height:80px; margin:0 auto; border-radius:50%; background:white; border:3px solid var(--qpy-orange); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--qpy-orange-dark); font-weight:800;">
+        <div style="font-size:1.0em;">D90</div>
+        <div style="font-size:0.6em; color:var(--azure-gray); margin-top:2px;">全员铺开</div>
+      </div>
+      <div style="margin-top:12px; font-size:0.85em; line-height:1.45;"><strong>Demo3 流水线全员铺开</strong><br/>月度 ROI 报告<br/>趣配音 FDE 训练营启动</div>
+    </div>
+  </div>
+  <div class="emphasis orange" style="margin-top:24px;">
+    🤝 <strong>FDE 是您的临时编制</strong> · 90 天结束您拿到的是 3 个上线场景 + 1 套可复制的 Harness 模板 + 1 批被赋能的工程师
+  </div>
+</div>
+<div class="slide">
+  <h1>下一步 + Q&A</h1>
+  <div class="grid cols-3" style="margin-top:20px;">
+    <div class="cta-card">
+      <div class="ord">①</div>
+      <div class="tt">📱 扫码领 Demo Repo</div>
+      <div class="ds">三个 demo 完整代码 + 90 秒录屏 + speaker notes</div>
+      <p style="margin-top:10px; font-size:0.78em; color:var(--azure-blue);"><code>github.com/turbo998/qupeiyin-ghcp-demo</code></p>
+    </div>
+    <div class="cta-card">
+      <div class="ord">②</div>
+      <div class="tt">📅 7 天内 FDE 上门 POC Scoping</div>
+      <div class="ds">签 NDA 即可启动 · 工作日上门 · 半天对齐 + 半天动手</div>
+      <p style="margin-top:10px; font-size:0.78em; color:var(--qpy-orange-dark);">联系您的 Microsoft 客户经理</p>
+    </div>
+    <div class="cta-card">
+      <div class="ord">③</div>
+      <div class="tt">📝 痛点表带回去</div>
+      <div class="ds">第 3 页那张 5 痛点表 · 下次同步我们带 prompt 模板初版</div>
+      <p style="margin-top:10px; font-size:0.78em; color:var(--azure-blue);">迭代闭环,不止单次交流</p>
+    </div>
+  </div>
+  <div class="qa-block">
+    <div class="qa">Q &amp; A</div>
+    <p class="sub">接下来时间留给在座各位 · 哪位先开始?</p>
+  </div>
+  <div style="text-align:center; margin-top:20px; color:var(--azure-gray); font-size:0.85em;">
+    🎤 趣配音 · 🐙 GitHub Copilot · ☁️ Microsoft Azure  ·  FDE Briefing 2026
+  </div>
+</div>
+</div>
+<div class="navigation">
+  <button class="nav-btn" id="prevBtn" onclick="prev()" title="上一页">◀</button>
+  <button class="nav-btn" onclick="goFirst()" title="首页">⟪</button>
+  <button class="nav-btn" onclick="goLast()" title="末页">⟫</button>
+  <button class="nav-btn" id="nextBtn" onclick="next()" title="下一页">▶</button>
+</div>
+<script>
+
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+
+function updateSlide() {
+  slides.forEach((slide, idx) => {
+    slide.classList.remove('active');
+    if (idx === currentSlide) {
+      slide.classList.add('active');
+      slide.scrollTop = 0;
+    }
+  });
+  document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+  document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+  document.getElementById('prevBtn').disabled = (currentSlide === 0);
+  document.getElementById('nextBtn').disabled = (currentSlide === totalSlides - 1);
+}
+function next() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+function prev() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+function goFirst() { currentSlide = 0; updateSlide(); }
+function goLast() { currentSlide = totalSlides - 1; updateSlide(); }
+
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+  else if (['ArrowLeft','PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  else if (e.key === 'Home') { e.preventDefault(); goFirst(); }
+  else if (e.key === 'End') { e.preventDefault(); goLast(); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].screenX - touchStartX;
+  if (Math.abs(dx) > 50) {
+    if (dx < 0) next(); else prev();
+  }
+});
+
+updateSlide();
+</script>
+</body>
+</html>

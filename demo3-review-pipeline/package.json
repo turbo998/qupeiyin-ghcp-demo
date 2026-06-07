@@ -1,0 +1,17 @@
+{
+  "name": "qupeiyin-moderation-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "趣配音 K12 英语配音学习平台 — 内容审核服务 (Demo 3 多 Agent 流水线)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

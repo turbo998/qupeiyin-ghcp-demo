@@ -1,0 +1,7 @@
+# Demo 1 - 配音素材自动打标签
+# Python 依赖清单 (Python 3.10+)
+
+streamlit>=1.32.0
+litellm>=1.40.0
+pandas>=2.0.0
+pyyaml>=6.0

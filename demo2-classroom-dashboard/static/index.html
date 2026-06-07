@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>趣配音 · 班级作业看板</title>
+  <!-- ECharts CDN (单文件，无构建) -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    :root {
+      --msft-blue: #0078D4;
+      --msft-blue-dark: #005A9E;
+      --qpy-orange: #FF6B35;
+      --qpy-orange-light: #FF8A5C;
+      --bg: #F5F7FA;
+      --card: #FFFFFF;
+      --text: #1F2937;
+      --text-soft: #6B7280;
+      --border: #E5E7EB;
+      --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+    }
+    header {
+      background: linear-gradient(90deg, var(--msft-blue) 0%, var(--msft-blue-dark) 100%);
+      color: #fff;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+    }
+    header h1 {
+      margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;
+    }
+    header .meta { font-size: 12px; opacity: 0.85; }
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+    /* 侧栏 */
+    aside {
+      background: var(--card);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      height: fit-content;
+    }
+    aside h3 {
+      margin: 0 0 10px 0; font-size: 13px; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+    }
+    .class-list {
+      display: flex; flex-direction: column; gap: 4px; margin-bottom: 18px;
+      max-height: 360px; overflow-y: auto;
+    }
+    .class-item {
+      padding: 8px 12px; border-radius: 6px; cursor: pointer;
+      border: 1px solid transparent; transition: all .15s;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .class-item:hover { background: #F0F4F8; }
+    .class-item.active {
+      background: var(--qpy-orange);
+      color: #fff; font-weight: 600;
+      border-color: var(--qpy-orange);
+    }
+    .class-item .grade-tag {
+      font-size: 11px; padding: 1px 6px; border-radius: 8px;
+      background: #E0E7EF; color: var(--text-soft);
+    }
+    .class-item.active .grade-tag {
+      background: rgba(255,255,255,.25); color: #fff;
+    }
+    .range-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .range-btn {
+      padding: 6px 10px; border: 1px solid var(--border); background: #fff;
+      border-radius: 4px; cursor: pointer; font-size: 12px; color: var(--text);
+    }
+    .range-btn:hover { border-color: var(--msft-blue); }
+    .range-btn.active {
+      background: var(--qpy-orange); color: #fff; border-color: var(--qpy-orange);
+      font-weight: 600;
+    }
+    /* 主内容 */
+    main { display: flex; flex-direction: column; gap: 20px; }
+    /* KPI */
+    .kpi-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .kpi-card {
+      background: var(--card); border-radius: 8px; padding: 18px 22px;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .kpi-card::before {
+      content: ""; position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%; background: var(--msft-blue);
+    }
+    .kpi-card .label {
+      font-size: 13px; color: var(--text-soft); margin-bottom: 8px;
+    }
+    .kpi-card .value {
+      font-size: 32px; font-weight: 700; color: var(--qpy-orange);
+      line-height: 1.1; font-variant-numeric: tabular-nums;
+    }
+    .kpi-card .unit {
+      font-size: 14px; color: var(--text-soft); margin-left: 4px; font-weight: 500;
+    }
+    .kpi-card .sub {
+      font-size: 11px; color: var(--text-soft); margin-top: 4px;
+    }
+    /* 图表网格 */
+    .chart-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    .chart-card {
+      background: var(--card); border-radius: 8px; padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .chart-card h3 {
+      margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .chart-card h3::before {
+      content: ""; display: inline-block; width: 3px; height: 14px;
+      background: var(--qpy-orange); border-radius: 2px;
+    }
+    .chart-box { width: 100%; height: 320px; }
+    /* 表格 */
+    table.pending-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    .pending-table thead th {
+      text-align: left; padding: 10px 8px; border-bottom: 2px solid var(--border);
+      color: var(--text-soft); font-weight: 600; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .pending-table tbody td {
+      padding: 9px 8px; border-bottom: 1px solid #F1F3F6;
+    }
+    .pending-table tbody tr:hover { background: #FAFBFC; }
+    .pending-count {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      background: #FEE4DA; color: var(--qpy-orange); font-weight: 600;
+      font-size: 12px; min-width: 22px; text-align: center;
+    }
+    .empty { color: var(--text-soft); text-align: center; padding: 30px 0; font-size: 13px; }
+    /* loading & error */
+    .toast {
+      position: fixed; top: 80px; right: 24px; padding: 10px 14px;
+      background: #fff; border-left: 3px solid var(--qpy-orange);
+      box-shadow: 0 4px 12px rgba(0,0,0,.1); font-size: 13px; border-radius: 4px;
+      z-index: 99; display: none;
+    }
+    .toast.show { display: block; }
+
+    @media (max-width: 1100px) {
+      .chart-grid, .kpi-row { grid-template-columns: 1fr 1fr; }
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎬 趣配音 · 班级作业看板</h1>
+    <div class="meta">数据更新于 <span id="updateTime">--</span> · K12 英语配音学习平台</div>
+  </header>
+
+  <div class="layout">
+    <!-- 侧栏 -->
+    <aside>
+      <h3>班级选择</h3>
+      <div class="class-list" id="classList">加载中...</div>
+
+      <h3>时间范围</h3>
+      <div class="range-buttons" id="rangeButtons">
+        <button class="range-btn"               data-days="7">近 7 天</button>
+        <button class="range-btn active"        data-days="14">近 14 天</button>
+        <button class="range-btn"               data-days="30">近 30 天</button>
+      </div>
+
+      <div style="margin-top:24px; font-size:11px; color:var(--text-soft); line-height:1.7;">
+        💡 提示：切换班级 / 时间后图表自动刷新。<br/>
+        🔌 扩展点：<code>/api/parent_checkin</code> 已预留（家长打卡）。
+      </div>
+    </aside>
+
+    <!-- 主内容 -->
+    <main>
+      <!-- KPI -->
+      <section class="kpi-row" id="kpiRow">
+        <div class="kpi-card"><div class="label">总学生数</div>
+          <div class="value"><span id="kpiStudents">--</span><span class="unit">人</span></div>
+          <div class="sub">覆盖 10 个班级</div>
+        </div>
+        <div class="kpi-card"><div class="label">本周完成率</div>
+          <div class="value"><span id="kpiCompletion">--</span><span class="unit">%</span></div>
+          <div class="sub" id="kpiCompletionSub">近 7 天作业</div>
+        </div>
+        <div class="kpi-card"><div class="label">平均分</div>
+          <div class="value"><span id="kpiAvg">--</span><span class="unit">分</span></div>
+          <div class="sub">已打分作业</div>
+        </div>
+        <div class="kpi-card"><div class="label">活跃班级数</div>
+          <div class="value"><span id="kpiActive">--</span><span class="unit">/10</span></div>
+          <div class="sub">近 7 天有提交</div>
+        </div>
+      </section>
+
+      <!-- 图表 -->
+      <section class="chart-grid">
+        <div class="chart-card">
+          <h3>A · 各班完成率（按时间窗）</h3>
+          <div id="chartCompletion" class="chart-box"></div>
+        </div>
+        <div class="chart-card">
+          <h3>B · 均分趋势（近 N 天）</h3>
+          <div id="chartTrend" class="chart-box"></div>
+        </div>
+        <div class="chart-card">
+          <h3>C · 待补做名单 Top 10</h3>
+          <div id="pendingTableWrap" style="max-height:320px; overflow-y:auto;">
+            <table class="pending-table">
+              <thead><tr><th>#</th><th>姓名</th><th>班级</th><th style="text-align:right;">待补</th></tr></thead>
+              <tbody id="pendingTbody"><tr><td colspan="4" class="empty">加载中...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>D · 最受欢迎素材（按提交数）</h3>
+          <div id="chartMaterials" class="chart-box"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/* ---------- 全局状态 ---------- */
+const state = {
+  classes: [],
+  selectedClassId: null,   // null = 全校
+  days: 14,
+};
+
+const CHARTS = {};
+const COLORS = {
+  blue: "#0078D4",
+  blueLight: "#5AA8E0",
+  orange: "#FF6B35",
+  orangeLight: "#FF8A5C",
+  pieList: ["#FF6B35", "#0078D4", "#FFA94D", "#5AA8E0", "#FFB996",
+            "#00A4A6", "#7A5AF8", "#10B981", "#EF4444", "#9333EA"],
+};
+
+/* ---------- 工具 ---------- */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) {
+    const txt = await r.text().catch(() => r.statusText);
+    throw new Error(`${r.status} ${txt}`);
+  }
+  return r.json();
+}
+
+function todayStr() {
+  const d = new Date(); const z = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
+}
+function daysAgoStr(n) {
+  const d = new Date(); d.setDate(d.getDate() - n);
+  const z = x => String(x).padStart(2, "0");
+  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
+}
+
+/* ---------- 渲染：班级列表 ---------- */
+function renderClassList() {
+  const wrap = document.getElementById("classList");
+  const allBtn = `<div class="class-item ${state.selectedClassId === null ? "active" : ""}" data-cid="">
+    <span>全部班级</span><span class="grade-tag">全校</span></div>`;
+  const items = state.classes.map(c =>
+    `<div class="class-item ${state.selectedClassId === c.id ? "active" : ""}" data-cid="${c.id}">
+       <span>${c.name}</span><span class="grade-tag">G${c.grade}</span>
+     </div>`
+  ).join("");
+  wrap.innerHTML = allBtn + items;
+  wrap.querySelectorAll(".class-item").forEach(el => {
+    el.addEventListener("click", () => {
+      const cid = el.dataset.cid;
+      state.selectedClassId = cid === "" ? null : parseInt(cid, 10);
+      renderClassList();
+      refreshAll();
+    });
+  });
+}
+
+/* ---------- 渲染：KPI ---------- */
+async function renderKPI() {
+  try {
+    const k = await fetchJSON("/api/kpi");
+    document.getElementById("kpiStudents").textContent = k.total_students;
+    document.getElementById("kpiCompletion").textContent = k.week_completion_rate;
+    document.getElementById("kpiAvg").textContent = k.avg_score;
+    document.getElementById("kpiActive").textContent = k.active_classes;
+    document.getElementById("updateTime").textContent = new Date().toLocaleString("zh-CN");
+  } catch (e) {
+    showToast("KPI 加载失败: " + e.message);
+  }
+}
+
+/* ---------- A. 完成率柱状图 ---------- */
+async function renderCompletion() {
+  const start = daysAgoStr(state.days);
+  const end = todayStr();
+  const cid = state.selectedClassId;
+  const url = `/api/completion_rate?start=${start}&end=${end}` +
+              (cid !== null ? `&class_id=${cid}` : "");
+  let data;
+  try { data = await fetchJSON(url); }
+  catch (e) { showToast("完成率加载失败: " + e.message); return; }
+
+  const chart = CHARTS.completion || (CHARTS.completion = echarts.init(document.getElementById("chartCompletion")));
+  const xs = data.items.map(i => i.class_name);
+  const ys = data.items.map(i => ({
+    value: i.rate,
+    itemStyle: { color: i.highlighted ? COLORS.orange : COLORS.blue },
+  }));
+  chart.setOption({
+    tooltip: {
+      trigger: "axis",
+      formatter: p => {
+        const it = data.items[p[0].dataIndex];
+        return `<b>${it.class_name}</b><br/>完成率 ${it.rate}%<br/>已完成 ${it.done} / 总数 ${it.total}`;
+      },
+    },
+    grid: { left: 40, right: 16, top: 24, bottom: 30 },
+    xAxis: {
+      type: "category", data: xs,
+      axisLabel: { color: "#6B7280", fontSize: 11 },
+      axisLine: { lineStyle: { color: "#E5E7EB" } },
+    },
+    yAxis: {
+      type: "value", max: 100,
+      axisLabel: { formatter: "{value}%", color: "#6B7280", fontSize: 11 },
+      splitLine: { lineStyle: { color: "#F1F3F6" } },
+    },
+    series: [{
+      type: "bar", data: ys, barWidth: "55%",
+      label: { show: true, position: "top", formatter: "{c}%", fontSize: 11, color: "#374151" },
+    }],
+  });
+  chart.resize();
+}
+
+/* ---------- B. 均分趋势 ---------- */
+async function renderTrend() {
+  const cid = state.selectedClassId;
+  const url = `/api/avg_score_trend?days=${state.days}` +
+              (cid !== null ? `&class_id=${cid}` : "");
+  let data;
+  try { data = await fetchJSON(url); }
+  catch (e) { showToast("趋势加载失败: " + e.message); return; }
+
+  const chart = CHARTS.trend || (CHARTS.trend = echarts.init(document.getElementById("chartTrend")));
+  const xs = data.series.map(s => s.date.slice(5));   // MM-DD
+  const ys = data.series.map(s => s.avg_score);
+  chart.setOption({
+    tooltip: {
+      trigger: "axis",
+      formatter: p => {
+        const s = data.series[p[0].dataIndex];
+        if (s.avg_score === null) return `${s.date}<br/>当日无打分`;
+        return `${s.date}<br/>均分 <b>${s.avg_score}</b><br/>样本数 ${s.count}`;
+      },
+    },
+    grid: { left: 40, right: 16, top: 24, bottom: 28 },
+    xAxis: {
+      type: "category", boundaryGap: false, data: xs,
+      axisLabel: { color: "#6B7280", fontSize: 11 },
+      axisLine: { lineStyle: { color: "#E5E7EB" } },
+    },
+    yAxis: {
+      type: "value", min: 60, max: 100,
+      axisLabel: { color: "#6B7280", fontSize: 11 },
+      splitLine: { lineStyle: { color: "#F1F3F6" } },
+    },
+    series: [{
+      type: "line", smooth: true, data: ys, connectNulls: true,
+      symbol: "circle", symbolSize: 6,
+      lineStyle: { color: COLORS.orange, width: 2.5 },
+      itemStyle: { color: COLORS.orange, borderColor: "#fff", borderWidth: 2 },
+      areaStyle: {
+        color: { type: "linear", x: 0, y: 0, x2: 0, y2: 1,
+                 colorStops: [{offset:0, color:"rgba(255,107,53,.28)"},
+                              {offset:1, color:"rgba(255,107,53,0)"}] }
+      },
+    }],
+  });
+  chart.resize();
+}
+
+/* ---------- C. 待补做名单 ---------- */
+async function renderPending() {
+  const cid = state.selectedClassId;
+  const url = `/api/pending_students?limit=10` + (cid !== null ? `&class_id=${cid}` : "");
+  let data;
+  try { data = await fetchJSON(url); }
+  catch (e) { showToast("名单加载失败: " + e.message); return; }
+
+  const tbody = document.getElementById("pendingTbody");
+  if (!data.items.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="empty">🎉 全部完成，无人需补做</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.items.map((it, i) => `
+    <tr>
+      <td style="color:#9CA3AF; font-variant-numeric:tabular-nums;">${i + 1}</td>
+      <td><b>${it.student_name}</b></td>
+      <td><span style="color:var(--text-soft);">${it.class_name}</span></td>
+      <td style="text-align:right;"><span class="pending-count">${it.pending_count}</span></td>
+    </tr>
+  `).join("");
+}
+
+/* ---------- D. 最受欢迎素材 ---------- */
+async function renderMaterials() {
+  let data;
+  try { data = await fetchJSON("/api/popular_materials?limit=5"); }
+  catch (e) { showToast("素材加载失败: " + e.message); return; }
+
+  const chart = CHARTS.materials ||
+    (CHARTS.materials = echarts.init(document.getElementById("chartMaterials")));
+  const seriesData = data.items.map((it, i) => ({
+    name: it.title.length > 22 ? it.title.slice(0, 22) + "…" : it.title,
+    value: it.submission_count,
+    itemStyle: { color: COLORS.pieList[i % COLORS.pieList.length] },
+  }));
+  chart.setOption({
+    tooltip: { trigger: "item", formatter: "{b}<br/>提交数: {c} ({d}%)" },
+    legend: { orient: "vertical", right: 0, top: "middle", textStyle: { fontSize: 11 } },
+    series: [{
+      type: "pie", radius: ["38%", "65%"], center: ["38%", "50%"],
+      avoidLabelOverlap: true,
+      label: { show: true, formatter: "{d}%", fontSize: 11 },
+      labelLine: { length: 6, length2: 8 },
+      data: seriesData,
+    }],
+  });
+  chart.resize();
+}
+
+/* ---------- 总调度 ---------- */
+async function refreshAll() {
+  await Promise.all([renderKPI(), renderCompletion(), renderTrend(),
+                     renderPending(), renderMaterials()]);
+}
+
+/* ---------- 启动 ---------- */
+(async function init() {
+  // 1. 班级列表
+  try {
+    state.classes = await fetchJSON("/api/classes");
+  } catch (e) { showToast("班级列表加载失败: " + e.message); return; }
+  renderClassList();
+
+  // 2. 时间范围按钮
+  document.querySelectorAll(".range-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".range-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.days = parseInt(btn.dataset.days, 10);
+      refreshAll();
+    });
+  });
+
+  // 3. 首次渲染
+  await refreshAll();
+
+  // 4. 窗口 resize
+  window.addEventListener("resize", () => {
+    Object.values(CHARTS).forEach(c => c && c.resize());
+  });
+})();
+</script>
+</body>
+</html>
