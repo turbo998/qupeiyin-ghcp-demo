@@ -28,6 +28,8 @@ powershell -ExecutionPolicy Bypass -File .\start-all.ps1
 ```
 
 > 💡 两个脚本都会自动选用 repo 内 `.venv`（若存在），并在首次运行时自动 seed Demo2 数据库、`npm install` Demo3。`Ctrl+C` 一次性停止全部。
+> 🧰 **零配置首启**：若机器上还没有装好依赖的 Python，脚本会用 `uv` 自动创建 `.venv`（x64 CPython 3.14，arm64 机器也能装齐 wheel）并按根目录 `requirements.txt` 装好依赖——只需先装好 [uv](https://docs.astral.sh/uv/) 和 Node 18+。
+> ⚙️ 环境变量见 `.env.example`（默认值即可直接演示，通常无需改）。
 > ⚠️ Windows 上 `start-all.sh` 请在 **Git Bash** 里运行（PATH 上的 `bash` 可能是 WSL，看不到 Windows 侧的 `.venv`）；或直接用 `start-all.ps1`。
 
 启动完后浏览器打开：
@@ -58,6 +60,8 @@ PPT 结构（17 页）：封面 → 60min 概览 → 5 痛点 → Copilot 3 跃�
 ├── mock-data/                  # 公开英语素材 + 字幕（10 条）
 ├── docs/                       # PPT + 客户带走资料
 ├── speaker-notes/              # 讲师手卡
+├── requirements.txt            # Python 依赖总清单 (一键脚本自动安装)
+├── .env.example                # 环境变量示例 (复制为 .env 按需改)
 ├── start-all.sh                # 一键启动 (bash / Git Bash)
 └── start-all.ps1               # 一键启动 (Windows PowerShell 原生)
 ```

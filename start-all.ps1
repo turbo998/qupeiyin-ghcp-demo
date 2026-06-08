@@ -16,7 +16,8 @@
 
  依赖:
    - Python: 优先用 repo 内 .venv，其次 PATH 上能 import streamlit 的 python
-   - Node 18+: demo3 首次会自动 npm install
+           首次若都没有，会用 uv 自动建 .venv 并装依赖 (需先装 uv)
+ - Node 18+: demo3 首次会自动 npm install
 ============================================================
 #>
 [CmdletBinding()]
@@ -57,11 +58,23 @@ function Find-Python {
 
 $PY = Find-Python
 if (-not $PY) {
-    Write-Host "❌ 找不到已装 streamlit 的 Python。请先创建 .venv:" -ForegroundColor Red
-    Write-Host "   uv venv .venv"
-    Write-Host "   uv pip install --python .venv\Scripts\python.exe ``"
-    Write-Host "        -r demo1-auto-tagging\requirements.txt ``"
-    Write-Host "        -r demo2-classroom-dashboard\requirements.txt"
+    if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+        Write-Host "❌ 未装 streamlit 且未找到 uv，无法自动建环境。" -ForegroundColor Red
+        Write-Host "   方案A: 安装 uv (https://docs.astral.sh/uv/) 后重跑本脚本"
+        Write-Host "   方案B: 手动 python -m venv .venv; .\.venv\Scripts\pip install -r requirements.txt"
+        exit 1
+    }
+    Write-Host "🧰 首次运行：创建 .venv 并安装 Python 依赖 (uv, 约 1-2 分钟) ..." -ForegroundColor Yellow
+    uv venv .venv --python 3.14
+    if ($LASTEXITCODE -ne 0) { uv venv .venv }
+    if ($LASTEXITCODE -ne 0) { Write-Host "❌ uv venv 失败" -ForegroundColor Red; exit 1 }
+    $venvPy = Join-Path $Root '.venv\Scripts\python.exe'
+    uv pip install --python $venvPy -r (Join-Path $Root 'requirements.txt')
+    if ($LASTEXITCODE -ne 0) { Write-Host "❌ 依赖安装失败" -ForegroundColor Red; exit 1 }
+    $PY = Find-Python
+}
+if (-not $PY) {
+    Write-Host "❌ Python 环境就绪失败，请检查上面的报错。" -ForegroundColor Red
     exit 1
 }
 

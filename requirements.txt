@@ -1,0 +1,22 @@
+# ============================================================
+# 趣配音 × GitHub Copilot Demo — 一键 run 的 Python 依赖总清单
+# (Demo1 打标签 + Demo2 班级看板; Demo3 是 Node, 走 npm)
+#
+# start-all.sh / start-all.ps1 首次运行会自动:
+#   uv venv .venv --python 3.14         # x64 CPython, arm64 机器也能装齐 wheel
+#   uv pip install -r requirements.txt
+#
+# 手动安装:
+#   uv venv .venv --python 3.14
+#   uv pip install --python .venv -r requirements.txt
+# ============================================================
+
+# --- Demo 1: 配音素材自动打标签 (Streamlit) ---
+streamlit>=1.32.0
+litellm>=1.40.0
+pandas>=2.0.0
+pyyaml>=6.0
+
+# --- Demo 2: 班级看板 (FastAPI) ---
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0

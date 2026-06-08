@@ -13,7 +13,7 @@
 #
 # 依赖:
 #   - Python: 优先用 repo 内 .venv，其次 PATH 上能 import streamlit 的 python
-#             首次请先建好环境 (见 README「环境要求」)
+#             首次若都没有，会用 uv 自动建 .venv 并装依赖 (需先装 uv)
 #   - Node 18+: demo3 首次会自动 npm install
 #
 # Windows 提示: 请在 **Git Bash** 里运行本脚本 (PATH 上的 bash 可能是 WSL，
@@ -51,12 +51,29 @@ pick_python() {
   return 1
 }
 
+# ------------------------------------------------------------
+# 首次自动建环境: uv venv .venv (x64 CPython 3.14, arm64 机器也能装齐 wheel)
+#                + uv pip install -r requirements.txt
+# ------------------------------------------------------------
+bootstrap_venv() {
+  command -v uv >/dev/null 2>&1 || {
+    echo "❌ 未装 streamlit 且未找到 uv，无法自动建环境。" >&2
+    echo "   方案A: 安装 uv (https://docs.astral.sh/uv/) 后重跑本脚本" >&2
+    echo "   方案B: 手动 python -m venv .venv && .venv/Scripts/pip install -r requirements.txt" >&2
+    return 1
+  }
+  echo "🧰 首次运行：创建 .venv 并安装 Python 依赖 (uv, 约 1-2 分钟) ..."
+  uv venv .venv --python 3.14 || uv venv .venv || return 1
+  local venv_py="$ROOT/.venv/Scripts/python.exe"
+  [ -x "$venv_py" ] || venv_py="$ROOT/.venv/bin/python"
+  uv pip install --python "$venv_py" -r requirements.txt || return 1
+}
+
 PY="$(pick_python)" || {
-  echo "❌ 找不到已装 streamlit 的 Python。请先创建 .venv:" >&2
-  echo "   uv venv .venv" >&2
-  echo "   uv pip install --python .venv/Scripts/python.exe \\" >&2
-  echo "        -r demo1-auto-tagging/requirements.txt \\" >&2
-  echo "        -r demo2-classroom-dashboard/requirements.txt" >&2
+  bootstrap_venv && PY="$(pick_python)"
+}
+[ -n "${PY:-}" ] || {
+  echo "❌ Python 环境就绪失败，请检查上面的报错。" >&2
   exit 1
 }
 
