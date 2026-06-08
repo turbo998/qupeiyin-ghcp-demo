@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>趣配音 · 班级作业看板</title>
-  <!-- ECharts CDN (单文件，无构建) -->
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <!-- 本地 vendored ECharts，避免现场网络 / CDN 策略导致页面空白 -->
+  <script src="/static/vendor/echarts.min.js"></script>
   <style>
     :root {
       --msft-blue: #0078D4;

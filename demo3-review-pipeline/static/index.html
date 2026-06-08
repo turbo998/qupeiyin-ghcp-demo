@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>趣配音 · 审核服务演示台</title>
+  <style>
+    :root {
+      --msft-blue: #0078d4;
+      --msft-blue-dark: #005a9e;
+      --qpy-orange: #ff6b35;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1f2937;
+      --text-soft: #6b7280;
+      --border: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: linear-gradient(90deg, var(--msft-blue) 0%, var(--msft-blue-dark) 100%);
+      color: #fff;
+      padding: 20px 28px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 24px; }
+    header p { margin: 0; opacity: .9; }
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .04);
+    }
+    h2 { margin: 0 0 14px; font-size: 18px; }
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .pill {
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      background: #eef6fd;
+      color: var(--msft-blue-dark);
+      margin-bottom: 12px;
+    }
+    .label {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--qpy-orange);
+    }
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      resize: vertical;
+      font: inherit;
+      line-height: 1.6;
+    }
+    button {
+      margin-top: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--qpy-orange);
+      color: #fff;
+      padding: 10px 16px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(.97); }
+    pre {
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 10px;
+      overflow: auto;
+      min-height: 260px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .links a {
+      color: var(--msft-blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      .meta { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Demo 3 · 审核服务演示台</h1>
+    <p>现场可直接打开浏览器演示服务状态、API 契约和实时审核结果，不再停留在 /health 的 JSON 页面。</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="pill">Node + Express · Content Moderation</div>
+      <div class="meta">
+        <div>
+          <div class="label">服务状态</div>
+          <div class="value" id="healthStatus">--</div>
+        </div>
+        <div>
+          <div class="label">服务名</div>
+          <div class="value" id="serviceName" style="font-size:20px;">--</div>
+        </div>
+        <div>
+          <div class="label">版本</div>
+          <div class="value" id="serviceVersion">--</div>
+        </div>
+      </div>
+
+      <h2>实时审核试跑</h2>
+      <p>输入 transcript，点击按钮直接调用 <code>POST /api/moderate</code>。</p>
+      <textarea id="transcript">Hello, my name is Alice. I love English and I read clearly.</textarea>
+      <button id="submitBtn" type="button">运行审核</button>
+      <div class="links">
+        <a href="/health" target="_blank" rel="noreferrer">查看 /health</a>
+        <a href="https://github.com/turbo998/qupeiyin-ghcp-demo/tree/main/demo3-review-pipeline" target="_blank" rel="noreferrer">查看 demo3 代码</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>返回结果</h2>
+      <pre id="resultBox">{
+  "tip": "点击左侧按钮后，这里会显示审核结果"
+}</pre>
+    </section>
+  </main>
+
+  <script>
+    async function loadHealth() {
+      const res = await fetch('/health');
+      const data = await res.json();
+      document.getElementById('healthStatus').textContent = data.status.toUpperCase();
+      document.getElementById('serviceName').textContent = data.service;
+      document.getElementById('serviceVersion').textContent = data.version;
+    }
+
+    async function runModeration() {
+      const transcript = document.getElementById('transcript').value;
+      const resultBox = document.getElementById('resultBox');
+      resultBox.textContent = '运行中...';
+
+      const res = await fetch('/api/moderate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcript,
+          audio_meta: { duration_sec: 5.2, sample_rate: 16000 }
+        })
+      });
+
+      const data = await res.json();
+      resultBox.textContent = JSON.stringify(data, null, 2);
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      runModeration().catch((err) => {
+        document.getElementById('resultBox').textContent = JSON.stringify(
+          { error: err.message },
+          null,
+          2
+        );
+      });
+    });
+
+    loadHealth().catch((err) => {
+      document.getElementById('resultBox').textContent = JSON.stringify(
+        { error: 'health check failed', detail: err.message },
+        null,
+        2
+      );
+    });
+  </script>
+</body>
+</html>

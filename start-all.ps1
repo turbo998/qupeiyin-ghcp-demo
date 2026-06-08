@@ -156,7 +156,7 @@ try {
     Write-Host "✅ 全部启动完成！浏览器打开:" -ForegroundColor Green
     Write-Host "   Demo 1 打标签    -> http://localhost:8501"
     Write-Host "   Demo 2 班级看板  -> http://localhost:8000"
-    Write-Host "   Demo 3 审核服务  -> http://localhost:3000/health"
+    Write-Host "   Demo 3 审核服务  -> http://localhost:3000"
     Write-Host ""
     Write-Host "📜 日志: $LogDir\demo{1,2,3}.log"
     Write-Host "🛑 停止: 在本窗口按 Ctrl+C (一次性停止全部)"

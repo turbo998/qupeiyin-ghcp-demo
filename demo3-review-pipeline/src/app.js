@@ -1,5 +1,8 @@
+const path = require('node:path');
 const express = require('express');
 const { moderate, ValidationError } = require('./moderation');
+
+const HOME_PAGE = path.join(__dirname, '..', 'static', 'index.html');
 
 /**
  * 构建 Express App（导出工厂便于测试）。
@@ -8,6 +11,17 @@ const { moderate, ValidationError } = require('./moderation');
 function buildApp() {
   const app = express();
   app.use(express.json({ limit: '256kb' }));
+
+  app.get('/', (_req, res) => {
+    res.sendFile(HOME_PAGE, (err) => {
+      if (err) {
+        res
+          .status(500)
+          .type('html')
+          .send('<h1>Demo 3 首页缺失</h1><p>请检查 demo3-review-pipeline/static/index.html</p>');
+      }
+    });
+  });
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', service: 'qupeiyin-moderation', version: '0.1.0' });

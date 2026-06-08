@@ -34,8 +34,8 @@ powershell -ExecutionPolicy Bypass -File .\start-all.ps1
 
 启动完后浏览器打开：
 - http://localhost:8501  → Demo 1 打标签 UI
-- http://localhost:8000  → Demo 2 班级看板
-- VS Code 打开 demo3-review-pipeline/ → Demo 3 跑 Agent
+- http://localhost:8000  → Demo 2 班级看板（已改为本地 ECharts，无需外网 CDN）
+- http://localhost:3000  → Demo 3 审核服务演示台（浏览器可直接试跑 `/api/moderate`）
 
 ## 🖼 17 页讲师 PPT
 
