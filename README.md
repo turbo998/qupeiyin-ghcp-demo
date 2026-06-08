@@ -13,9 +13,22 @@
 ## 🚀 5 分钟现场启动
 
 ```bash
-# 一次启动所有 3 个 demo（端口 8501 / 8000 / 3000）
+# macOS / Linux / Git Bash — 一次启动所有 3 个 demo（端口 8501 / 8000 / 3000）
 ./start-all.sh
+# 现场断网兜底（Demo1 读 ideal_tags.json）
+OFFLINE=1 ./start-all.sh
 ```
+
+```powershell
+# Windows PowerShell 原生（双击即跑，免 Git Bash）
+.\start-all.ps1
+.\start-all.ps1 -Offline      # 断网兜底
+# 若被执行策略拦截：
+powershell -ExecutionPolicy Bypass -File .\start-all.ps1
+```
+
+> 💡 两个脚本都会自动选用 repo 内 `.venv`（若存在），并在首次运行时自动 seed Demo2 数据库、`npm install` Demo3。`Ctrl+C` 一次性停止全部。
+> ⚠️ Windows 上 `start-all.sh` 请在 **Git Bash** 里运行（PATH 上的 `bash` 可能是 WSL，看不到 Windows 侧的 `.venv`）；或直接用 `start-all.ps1`。
 
 启动完后浏览器打开：
 - http://localhost:8501  → Demo 1 打标签 UI
@@ -45,7 +58,8 @@ PPT 结构（17 页）：封面 → 60min 概览 → 5 痛点 → Copilot 3 跃�
 ├── mock-data/                  # 公开英语素材 + 字幕（10 条）
 ├── docs/                       # PPT + 客户带走资料
 ├── speaker-notes/              # 讲师手卡
-└── start-all.sh                # 一键启动
+├── start-all.sh                # 一键启动 (bash / Git Bash)
+└── start-all.ps1               # 一键启动 (Windows PowerShell 原生)
 ```
 
 ## 🎯 60 分钟时间表
