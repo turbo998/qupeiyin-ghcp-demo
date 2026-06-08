@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | 1 | 配音素材自动打标签 | 12 min | 业务（教研/运营） | Streamlit + LiteLLM + SQLite |
 | 2 | 班级作业看板 | 10 min | 业务（教研/管理） | FastAPI + SQLite + ECharts |
-| 3 | 审核服务多 Agent 流水线 | 8 min | IT（研发/架构） | Node.js + 5 个 Copilot Agent |
+| 3 | 审核服务多 Agent 流水线 | 8 min | IT（研发/架构） | Node.js + 6 个 ⭐ Copilot Agent |
 
 ## 🚀 5 分钟现场启动
 

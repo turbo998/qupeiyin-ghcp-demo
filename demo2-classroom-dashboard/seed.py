@@ -7,7 +7,7 @@ seed.py  -  趣配音 班级作业看板 mock 数据生成器
   - ~50 学生/班 (共 500 人)
   - 10 个素材 (从 ../mock-data/materials.json 加载)
   - 30 个作业 (每个素材作业布置 3 次)
-  - ~8000 条提交记录 (近 30 天，含完成/未完成/已打分 3 种状态)
+  - ~9550 条提交记录 (近 30 天，含完成/未完成/已打分 3 种状态)
 
 输出: data/classroom.db (SQLite)
 """
@@ -35,7 +35,7 @@ CLASS_DEFS = [
 ]
 STUDENTS_PER_CLASS = 50      # 共 500
 ASSIGNMENT_TIMES_PER_MAT = 3 # 30 个作业
-# 每个作业平均分发到的班级数（控制提交总量约 8000+）
+# 每个作业平均分发到的班级数（实际生成约 9550 条提交）
 CLASSES_PER_ASSIGNMENT_MIN = 5
 CLASSES_PER_ASSIGNMENT_MAX = 8
 DAYS_SPAN = 30
