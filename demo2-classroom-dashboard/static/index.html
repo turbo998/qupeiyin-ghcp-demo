@@ -254,8 +254,8 @@ const state = {
 
 const CHARTS = {};
 const COLORS = {
-  blue: "#0078D4",
-  blueLight: "#5AA8E0",
+  red: "#D92D20",
+  redDark: "#B42318",
   orange: "#FF6B35",
   orangeLight: "#FF8A5C",
   pieList: ["#FF6B35", "#0078D4", "#FFA94D", "#5AA8E0", "#FFB996",
@@ -340,7 +340,7 @@ async function renderCompletion() {
   const xs = data.items.map(i => i.class_name);
   const ys = data.items.map(i => ({
     value: i.rate,
-    itemStyle: { color: i.highlighted ? COLORS.orange : COLORS.blue },
+    itemStyle: { color: i.highlighted ? COLORS.redDark : COLORS.red },
   }));
   chart.setOption({
     tooltip: {
