@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/demo3-review-pipeline"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+  - package-ecosystem: "pip"
+    directory: "/demo1-auto-tagging"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+  - package-ecosystem: "pip"
+    directory: "/demo2-classroom-dashboard"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
